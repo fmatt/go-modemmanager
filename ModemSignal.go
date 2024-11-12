@@ -72,29 +72,31 @@ type modemSignal struct {
 
 // SignalProperty represents all available signal properties
 type SignalProperty struct {
-	Type MMSignalPropertyType `json:"property-type"` // define the Signal Property Type
-	Rssi float64              `json:"rssi"`          // The CDMA1x / CDMA EV-DO / GSM / UMTS / LTE RSSI (Received Signal Strength Indication), in dBm, given as a floating point value (Applicable for all types).
-	Ecio float64              `json:"ecio"`          // The CDMA1x Ec/Io / CDMA EV-DO Ec/Io / UMTS Ec/Io level in dBm, given as a floating point value (Only applicable for type Cdma, Evdo, Umts).
-	Sinr float64              `json:"sinr"`          // CDMA EV-DO SINR level, in dB, given as a floating point value (Only applicable for type Evdo).
-	Io   float64              `json:"io"`            // The CDMA EV-DO Io, in dBm, given as a floating point value (Only applicable for type Evdo).
-	Rscp float64              `json:"rscp"`          // The UMTS RSCP (Received Signal Code Power), in dBm, given as a floating point value (Only applicable for type Umts).
-	Rsrq float64              `json:"rsrq"`          // The LTE RSRP (Reference Signal Received Power), in dBm, given as a floating point value (Only applicable for type LTE).
-	Rsrp float64              `json:"rsrp"`          // The LTE RSRP (Reference Signal Received Power), in dBm, given as a floating point value (Only applicable for type LTE).
-	Snr  float64              `json:"snr"`           // The LTE S/R ratio, in dB, given as a floating point value (Only applicable for type LTE).
+	Type      MMSignalPropertyType `json:"property-type"` // define the Signal Property Type
+	Rssi      float64              `json:"rssi"`          // The CDMA1x / CDMA EV-DO / GSM / UMTS / LTE RSSI (Received Signal Strength Indication), in dBm, given as a floating point value (Applicable for all types).
+	Ecio      float64              `json:"ecio"`          // The CDMA1x Ec/Io / CDMA EV-DO Ec/Io / UMTS Ec/Io level in dBm, given as a floating point value (Only applicable for type Cdma, Evdo, Umts).
+	Sinr      float64              `json:"sinr"`          // CDMA EV-DO SINR level, in dB, given as a floating point value (Only applicable for type Evdo).
+	Io        float64              `json:"io"`            // The CDMA EV-DO Io, in dBm, given as a floating point value (Only applicable for type Evdo).
+	Rscp      float64              `json:"rscp"`          // The UMTS RSCP (Received Signal Code Power), in dBm, given as a floating point value (Only applicable for type Umts).
+	Rsrq      float64              `json:"rsrq"`          // The LTE RSRQ (Reference Signal Received Quality), in dB, given as a floating point value (Only applicable for type LTE).
+	Rsrp      float64              `json:"rsrp"`          // The LTE RSRP (Reference Signal Received Power), in dBm, given as a floating point value (Only applicable for type LTE).
+	Snr       float64              `json:"snr"`           // The LTE S/R ratio, in dB, given as a floating point value (Only applicable for type LTE).
+	ErrorRate float64              `json:"error-rate"`    // The Frame (CDMA) / Packet (EV-DO) / Bit (GSM) / Block (UMTS, LTE) error rate, in percentage value, given as a floating point value.
 }
 
 // MarshalJSON returns a byte array
 func (sp SignalProperty) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"Type": fmt.Sprint(sp.Type),
-		"Rssi": sp.Rssi,
-		"Ecio": sp.Ecio,
-		"Sinr": sp.Sinr,
-		"Io":   sp.Io,
-		"Rscp": sp.Rscp,
-		"Rsrq": sp.Rsrq,
-		"Rsrp": sp.Rsrp,
-		"Snr":  sp.Snr,
+		"Type":      fmt.Sprint(sp.Type),
+		"Rssi":      sp.Rssi,
+		"Ecio":      sp.Ecio,
+		"Sinr":      sp.Sinr,
+		"Io":        sp.Io,
+		"Rscp":      sp.Rscp,
+		"Rsrq":      sp.Rsrq,
+		"Rsrp":      sp.Rsrp,
+		"Snr":       sp.Snr,
+		"ErrorRate": sp.ErrorRate,
 	})
 }
 
@@ -107,7 +109,8 @@ func (sp SignalProperty) String() string {
 		", Rscp: " + fmt.Sprint(sp.Rscp) +
 		", Rsrq: " + fmt.Sprint(sp.Rsrq) +
 		", Rsrp: " + fmt.Sprint(sp.Rsrp) +
-		", Snr: " + fmt.Sprint(sp.Snr)
+		", Snr: " + fmt.Sprint(sp.Snr) +
+		", ErrorRate: " + fmt.Sprint(sp.ErrorRate)
 }
 func convertMapToSignalProperty(inputMap map[string]dbus.Variant, signalType MMSignalPropertyType) (sp SignalProperty) {
 	sp.Type = signalType
@@ -160,6 +163,12 @@ func convertMapToSignalProperty(inputMap map[string]dbus.Variant, signalType MMS
 			tmpValue, ok := element.Value().(float64)
 			if ok {
 				sp.Snr = tmpValue
+			}
+
+		case "error-rate":
+			tmpValue, ok := element.Value().(float64)
+			if ok {
+				sp.ErrorRate = tmpValue
 			}
 
 		}
